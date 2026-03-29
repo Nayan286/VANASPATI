@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vanaspati — Virtual Herbal Garden</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --moss: #2d4a2d;
+    --sage: #6b8c6b;
+    --fern: #4a7c59;
+    --cream: #f5f0e8;
+    --parchment: #ede5d0;
+    --gold: #c9a84c;
+    --rust: #8b4513;
+    --bark: #3d2b1f;
+    --mist: #e8f0e8;
+    --leaf: #7ab648;
+    --midnight: #1a2a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--midnight);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--leaf);
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(122,182,72,0.4);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.25s ease;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 30% 60%, rgba(74,124,89,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(45,74,45,0.2) 0%, transparent 50%),
+                var(--midnight);
+  }
+
+  .hero-bg-leaves {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .bg-leaf {
+    position: absolute;
+    opacity: 0.06;
+    font-size: clamp(80px, 15vw, 200px);
+    animation: floatLeaf 20s ease-in-out infinite;
+  }
+  .bg-leaf:nth-child(1) { top: 5%; left: 5%; animation-delay: 0s; }
+  .bg-leaf:nth-child(2) { top: 60%; right: 5%; animation-delay: -7s; font-size: clamp(60px,10vw,150px); }
+  .bg-leaf:nth-child(3) { bottom: 10%; left: 20%; animation-delay: -14s; font-size: clamp(40px,8vw,120px); }
+  .bg-leaf:nth-child(4) { top: 30%; right: 25%; animation-delay: -3s; }
+
+  @keyframes floatLeaf {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-30px) rotate(5deg); }
+    66% { transform: translateY(15px) rotate(-3deg); }
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(60px, 12vw, 140px);
+    font-weight: 700;
+    line-height: 0.9;
+    text-align: center;
+    letter-spacing: -2px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.6s forwards;
+  }
+
+  .hero-title .italic {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--sage);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 300;
+    color: rgba(245,240,232,0.6);
+    text-align: center;
+    max-width: 480px;
+    line-height: 1.7;
+    margin-top: 28px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.9s forwards;
+  }
+
+  .hero-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+
+  .btn-primary {
+    background: var(--fern);
+    color: var(--cream);
+    border: none;
+    padding: 14px 36px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--leaf);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover { transform: translateY(-2px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(245,240,232,0.3);
+    padding: 14px 36px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: none;
+    transition: all 0.3s ease;
+  }
+  .btn-ghost:hover { border-color: var(--sage); color: var(--sage); transform: translateY(-2px); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.8s forwards;
+  }
+  .scroll-hint span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px; height: 50px;
+    background: linear-gradient(to bottom, rgba(245,240,232,0.4), transparent);
+    animation: scrollAnim 2s ease-in-out infinite;
+  }
+  @keyframes scrollAnim {
+    0%, 100% { transform: scaleY(1); opacity: 1; }
+    50% { transform: scaleY(0.5); opacity: 0.3; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--bark);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: center;
+    gap: clamp(32px, 6vw, 100px);
+    flex-wrap: wrap;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: var(--gold);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(245,240,232,0.5);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* SEARCH SECTION */
+  .search-section {
+    background: var(--moss);
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+  }
+  .search-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  .search-bar {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(26,42,26,0.5);
+    overflow: hidden;
+  }
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 16px 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--cream);
+    outline: none;
+  }
+  .search-input::placeholder { color: rgba(245,240,232,0.35); }
+
+  .search-btn {
+    background: var(--gold);
+    border: none;
+    padding: 16px 28px;
+    color: var(--bark);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: none;
+    transition: background 0.2s;
+  }
+  .search-btn:hover { background: var(--leaf); color: var(--midnight); }
+
+  .filter-pills {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .pill {
+    background: transparent;
+    border: 1px solid rgba(245,240,232,0.2);
+    color: rgba(245,240,232,0.6);
+    padding: 6px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: none;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .pill:hover, .pill.active {
+    background: var(--fern);
+    border-color: var(--fern);
+    color: var(--cream);
+  }
+
+  /* GARDEN GRID */
+  .garden-section {
+    padding: 80px 40px;
+    background: var(--midnight);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .garden-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2px;
+    margin-top: 48px;
+  }
+
+  .plant-card {
+    background: var(--bark);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    transition: all 0.4s ease;
+    border: 1px solid rgba(45,74,45,0.3);
+  }
+
+  .plant-card:hover {
+    transform: scale(1.02);
+    z-index: 10;
+    border-color: var(--sage);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .plant-card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    background: linear-gradient(135deg, var(--moss), var(--midnight));
+    transition: transform 0.4s ease;
+  }
+
+  .plant-card:hover .plant-card-img { transform: scale(1.05); }
+
+  .plant-card-body { padding: 20px; }
+
+  .plant-family {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .plant-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: var(--cream);
+  }
+
+  .plant-latin {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--sage);
+    margin-bottom: 12px;
+  }
+
+  .plant-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(245,240,232,0.6);
+    margin-bottom: 16px;
+  }
+
+  .plant-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .plant-tag {
+    background: rgba(74,124,89,0.2);
+    border: 1px solid rgba(74,124,89,0.4);
+    color: var(--sage);
+    padding: 3px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .plant-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .rarity-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(245,240,232,0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.common { background: var(--sage); }
+  .dot.uncommon { background: var(--gold); }
+  .dot.rare { background: #c44; }
+
+  .view-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    padding: 6px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    cursor: none;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .view-btn:hover { background: var(--gold); color: var(--bark); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,20,10,0.92);
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bark);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(201,168,76,0.3);
+    position: relative;
+    animation: modalIn 0.3s ease;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: transparent;
+    border: 1px solid rgba(245,240,232,0.2);
+    color: var(--cream);
+    width: 36px; height: 36px;
+    font-size: 18px;
+    cursor: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  .modal-close:hover { background: rgba(245,240,232,0.1); }
+
+  .modal-hero {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    background: linear-gradient(135deg, var(--moss), var(--midnight));
+    position: relative;
+  }
+  .modal-hero-badge {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: var(--gold);
+    color: var(--bark);
+    padding: 4px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .modal-body { padding: 32px; }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .modal-latin {
+    font-style: italic;
+    font-size: 16px;
+    color: var(--sage);
+    margin-bottom: 24px;
+  }
+
+  .modal-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(245,240,232,0.1);
+    margin-bottom: 24px;
+    gap: 4px;
+  }
+  .modal-tab {
+    background: transparent;
+    border: none;
+    color: rgba(245,240,232,0.4);
+    padding: 10px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: none;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .modal-tab.active, .modal-tab:hover {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .info-block {
+    background: rgba(45,74,45,0.2);
+    padding: 16px;
+    border-left: 3px solid var(--fern);
+  }
+
+  .info-block-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .info-block-val {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--cream);
+  }
+
+  .uses-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .uses-list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(245,240,232,0.8);
+  }
+  .uses-list li::before {
+    content: '◈';
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-box {
+    background: rgba(139,69,19,0.2);
+    border: 1px solid rgba(139,69,19,0.5);
+    padding: 16px;
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .warning-icon { font-size: 20px; flex-shrink: 0; }
+  .warning-text { font-size: 13px; line-height: 1.6; color: rgba(245,240,232,0.7); }
+
+  /* MAP SECTION */
+  .map-section {
+    background: var(--moss);
+    padding: 80px 40px;
+    text-align: center;
+  }
+
+  .world-map-container {
+    max-width: 900px;
+    margin: 48px auto 0;
+    position: relative;
+    background: rgba(26,42,26,0.6);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 40px;
+    border-radius: 2px;
+  }
+
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .region-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+  }
+
+  .region-card {
+    background: rgba(45,74,45,0.3);
+    border: 1px solid rgba(74,124,89,0.3);
+    padding: 20px;
+    cursor: none;
+    transition: all 0.3s;
+    text-align: left;
+  }
+  .region-card:hover {
+    background: rgba(74,124,89,0.3);
+    border-color: var(--sage);
+    transform: translateY(-3px);
+  }
+  .region-icon { font-size: 28px; margin-bottom: 8px; }
+  .region-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .region-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 2px;
+  }
+
+  /* FEATURES SECTION */
+  .features-section {
+    padding: 80px 40px;
+    background: var(--midnight);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 32px;
+    margin-top: 48px;
+  }
+
+  .feature-card {
+    border-top: 1px solid rgba(201,168,76,0.3);
+    padding-top: 24px;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: var(--cream);
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(245,240,232,0.55);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--bark);
+    border-top: 1px solid rgba(201,168,76,0.2);
+    padding: 40px;
+    text-align: center;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .footer-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(245,240,232,0.35);
+    text-transform: uppercase;
+  }
+
+  .no-results {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(245,240,232,0.4);
+    font-size: 18px;
+    font-style: italic;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--midnight); }
+  ::-webkit-scrollbar-thumb { background: var(--moss); }
+
+  /* Section reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Loading */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(45,74,45,0.3) 25%, rgba(74,124,89,0.2) 50%, rgba(45,74,45,0.3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-leaves">
+    <div class="bg-leaf">🌿</div>
+    <div class="bg-leaf">🌱</div>
+    <div class="bg-leaf">🍃</div>
+    <div class="bg-leaf">☘️</div>
+  </div>
+
+  <div class="hero-eyebrow">Virtual Herbal Garden · Est. 2025</div>
+  <h1 class="hero-title">
+    Vanas<span class="italic">pati</span>
+  </h1>
+  <p class="hero-subtitle">
+    A living digital archive of medicinal plants — their origins, healing properties, and traditional wisdom, made accessible to everyone.
+  </p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.querySelector('.search-section').scrollIntoView({behavior:'smooth'})">
+      <span>Explore Garden</span>
+    </button>
+    <button class="btn-ghost" onclick="document.querySelector('.map-section').scrollIntoView({behavior:'smooth'})">
+      Discover by Region
+    </button>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number">120+</div>
+    <div class="stat-label">Plants Catalogued</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">18</div>
+    <div class="stat-label">Herb Families</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">8</div>
+    <div class="stat-label">Global Regions</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">340+</div>
+    <div class="stat-label">Medicinal Uses</div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<section class="search-section reveal">
+  <div class="section-label">Discover Plants</div>
+  <h2 class="section-heading">Search the Garden</h2>
+  <div class="search-bar">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search by name, use, or ailment…">
+    <button class="search-btn" onclick="filterPlants()">SEARCH</button>
+  </div>
+  <div class="filter-pills" id="filterPills">
+    <button class="pill active" onclick="setFilter('all', this)">All Plants</button>
+    <button class="pill" onclick="setFilter('digestive', this)">Digestive</button>
+    <button class="pill" onclick="setFilter('immunity', this)">Immunity</button>
+    <button class="pill" onclick="setFilter('skincare', this)">Skin Care</button>
+    <button class="pill" onclick="setFilter('respiratory', this)">Respiratory</button>
+    <button class="pill" onclick="setFilter('calming', this)">Calming</button>
+    <button class="pill" onclick="setFilter('pain', this)">Pain Relief</button>
+  </div>
+</section>
+
+<!-- GARDEN -->
+<section class="garden-section">
+  <div class="reveal">
+    <div class="section-label">The Collection</div>
+    <h2 class="section-heading">Medicinal Plants</h2>
+  </div>
+  <div class="garden-grid" id="gardenGrid"></div>
+</section>
+
+<!-- MAP -->
+<section class="map-section reveal">
+  <div class="section-label">Global Distribution</div>
+  <h2 class="section-heading">Plants by Region</h2>
+  <p style="font-size:16px;color:rgba(245,240,232,0.55);max-width:500px;margin:0 auto;line-height:1.7;">
+    Traditional medicinal plants span the globe. Each region carries unique botanical heritage shaped by climate, culture, and centuries of practice.
+  </p>
+  <div class="world-map-container">
+    <div class="section-label" style="margin-bottom:16px;">Explore by Geographic Region</div>
+    <div class="region-grid">
+      <div class="region-card" onclick="setFilter('asia',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🌏</div>
+        <div class="region-name">South & East Asia</div>
+        <div class="region-count">48 plants documented</div>
+      </div>
+      <div class="region-card" onclick="setFilter('india',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🪷</div>
+        <div class="region-name">Indian Subcontinent</div>
+        <div class="region-count">35 plants documented</div>
+      </div>
+      <div class="region-card" onclick="setFilter('mediterranean',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🌊</div>
+        <div class="region-name">Mediterranean</div>
+        <div class="region-count">22 plants documented</div>
+      </div>
+      <div class="region-card" onclick="setFilter('americas',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🌎</div>
+        <div class="region-name">The Americas</div>
+        <div class="region-count">19 plants documented</div>
+      </div>
+      <div class="region-card" onclick="setFilter('africa',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🌍</div>
+        <div class="region-name">Africa</div>
+        <div class="region-count">15 plants documented</div>
+      </div>
+      <div class="region-card" onclick="setFilter('all',null);document.querySelector('.garden-section').scrollIntoView({behavior:'smooth'})">
+        <div class="region-icon">🌐</div>
+        <div class="region-name">All Regions</div>
+        <div class="region-count">View full collection</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section reveal">
+  <div class="section-label">Why Vanaspati</div>
+  <h2 class="section-heading" style="text-align:center;">A Garden Without Walls</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">🔬</span>
+      <h3 class="feature-title">Scientifically Verified</h3>
+      <p class="feature-desc">Every plant entry is cross-referenced with peer-reviewed ethnobotanical research and traditional texts like Charaka Samhita.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🌐</span>
+      <h3 class="feature-title">Universally Accessible</h3>
+      <p class="feature-desc">No physical access needed. Explore medicinal plants from rainforests, mountains, and deserts — all from your screen.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📚</span>
+      <h3 class="feature-title">Rich Documentation</h3>
+      <p class="feature-desc">Learn botanical names, traditional uses, preparation methods, active compounds, and regional variations for each plant.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🗺️</span>
+      <h3 class="feature-title">Geographic Mapping</h3>
+      <p class="feature-desc">Discover where plants grow natively, how they spread globally, and how different cultures use the same herb.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">⚕️</span>
+      <h3 class="feature-title">Safety First</h3>
+      <p class="feature-desc">Clear contraindications, dosage guidance, and drug interaction warnings accompany every entry. Always consult a practitioner.</p>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🌱</span>
+      <h3 class="feature-title">Living Archive</h3>
+      <p class="feature-desc">Continuously expanding with new species, updated research, and community contributions from herbalists worldwide.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Vanaspati</div>
+  <div class="footer-tagline">Virtual Herbal Garden · Healing knowledge for everyone</div>
+  <p style="margin-top:16px;font-size:12px;color:rgba(245,240,232,0.25);font-family:'DM Mono',monospace;">
+    For educational purposes only. Always consult a healthcare professional before use.
+  </p>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="plantModal">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <div class="modal-hero" id="modalHero">
+      <span id="modalEmoji"></span>
+      <div class="modal-hero-badge" id="modalBadge"></div>
+    </div>
+    <div class="modal-body">
+      <div class="plant-family" id="modalFamily"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-latin" id="modalLatin"></div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('overview', this)">Overview</button>
+        <button class="modal-tab" onclick="switchTab('uses', this)">Medicinal Uses</button>
+        <button class="modal-tab" onclick="switchTab('preparation', this)">Preparation</button>
+        <button class="modal-tab" onclick="switchTab('caution', this)">Cautions</button>
+      </div>
+      <div class="tab-pane active" id="tab-overview">
+        <div class="info-grid" id="infoGrid"></div>
+        <p id="modalDesc" style="font-size:15px;line-height:1.8;color:rgba(245,240,232,0.75);"></p>
+      </div>
+      <div class="tab-pane" id="tab-uses">
+        <ul class="uses-list" id="usesList"></ul>
+      </div>
+      <div class="tab-pane" id="tab-preparation">
+        <p id="prepText" style="font-size:15px;line-height:1.8;color:rgba(245,240,232,0.75);"></p>
+      </div>
+      <div class="tab-pane" id="tab-caution">
+        <div class="warning-box">
+          <span class="warning-icon">⚠️</span>
+          <p class="warning-text" id="cautionText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================
+// PLANT DATABASE
+// =====================
+const plants = [
+  {
+    id: 1, emoji: '🌿', name: 'Tulsi', latin: 'Ocimum tenuiflorum',
+    family: 'Lamiaceae', badge: 'Sacred Herb',
+    region: ['india', 'asia'], tags: ['immunity', 'respiratory', 'calming'],
+    rarity: 'common',
+    desc: 'Revered as the "Queen of Herbs" in Ayurveda, Tulsi has been central to Indian healing traditions for over 3,000 years. Its adaptogenic properties help the body manage stress while supporting respiratory and immune health.',
+    uses: [
+      'Boosts immunity and helps fight viral infections',
+      'Relieves respiratory conditions including coughs, colds, and asthma',
+      'Acts as an adaptogen, reducing stress and cortisol levels',
+      'Anti-inflammatory properties help with joint pain',
+      'Promotes healthy digestion and reduces bloating',
+      'Traditionally used to purify the environment'
+    ],
+    prep: 'Fresh leaves can be consumed raw or brewed into tea (5–7 leaves per cup, steep 5 minutes). Tulsi powder is commonly mixed into honey or warm water. Essential oil is used in aromatherapy. For immunity, daily consumption of 2–3 fresh leaves is traditional.',
+    caution: 'Generally very safe. May interact with blood-thinning medications. Not recommended in large doses during pregnancy as it may stimulate uterine contractions. Consult a practitioner before using therapeutically if on medications.',
+    info: { origin: 'Indian Subcontinent', habitat: 'Tropical & subtropical', part: 'Leaves, seeds, roots', season: 'Year-round', compounds: 'Eugenol, rosmarinic acid, ursolic acid' }
+  },
+  {
+    id: 2, emoji: '💛', name: 'Turmeric', latin: 'Curcuma longa',
+    family: 'Zingiberaceae', badge: 'Golden Root',
+    region: ['india', 'asia'], tags: ['pain', 'immunity', 'digestive'],
+    rarity: 'common',
+    desc: 'The golden spice of India, turmeric contains curcumin — one of the most studied natural anti-inflammatory compounds. Used for millennia in Ayurvedic and Chinese medicine for a vast range of conditions.',
+    uses: [
+      'Powerful anti-inflammatory — comparable to some NSAIDs without side effects',
+      'Strong antioxidant that neutralizes free radicals',
+      'Supports liver detoxification',
+      'Improves digestive health and reduces IBS symptoms',
+      'May support brain health and reduce risk of neurodegenerative disease',
+      'Topically used to heal wounds and improve skin tone'
+    ],
+    prep: 'Golden milk: 1 tsp turmeric + warm milk + black pepper (increases absorption by 2000%). Taken as capsules (500–1000mg curcumin daily). Applied topically as paste with honey for skin conditions. Cooking with fat also enhances bioavailability.',
+    caution: 'High doses may cause digestive upset. Avoid therapeutic doses in gallbladder disease. May interact with blood thinners and diabetes medications. Not recommended before surgery. Safe in culinary amounts during pregnancy.',
+    info: { origin: 'South Asia', habitat: 'Tropical forest floors', part: 'Rhizome (root)', season: 'Harvested Jan–Mar', compounds: 'Curcumin, turmerone, atlantone' }
+  },
+  {
+    id: 3, emoji: '🍃', name: 'Ashwagandha', latin: 'Withania somnifera',
+    family: 'Solanaceae', badge: 'Adaptogen King',
+    region: ['india'], tags: ['calming', 'immunity', 'pain'],
+    rarity: 'uncommon',
+    desc: 'Known as "Indian Winter Cherry," Ashwagandha is one of the most important herbs in Ayurveda. Its name means "smell of horse" — indicating it gives the strength and vitality of a horse. Classified as a rasayana (rejuvenator).',
+    uses: [
+      'Reduces chronic stress and anxiety levels measurably',
+      'Improves physical endurance and reduces fatigue',
+      'Balances hormones including thyroid and cortisol',
+      'Supports male reproductive health and testosterone',
+      'Improves sleep quality and duration',
+      'Neuroprotective — may slow cognitive decline'
+    ],
+    prep: 'Root powder (1/2–1 tsp) mixed in warm milk with honey before bed. Standardized extracts (300–600mg daily). Decoction made by boiling root in water for 15 minutes. Effects typically noticed after 4–8 weeks of consistent use.',
+    caution: 'Avoid during pregnancy. May interact with thyroid medications, immunosuppressants, and sedatives. Some people experience digestive discomfort. Stop 2 weeks before surgery. Not suitable for those with autoimmune conditions without medical supervision.',
+    info: { origin: 'India, North Africa', habitat: 'Dry arid regions', part: 'Root, leaves, berries', season: 'Winter harvest', compounds: 'Withanolides, alkaloids, saponins' }
+  },
+  {
+    id: 4, emoji: '🌼', name: 'Chamomile', latin: 'Matricaria chamomilla',
+    family: 'Asteraceae', badge: 'Calming Classic',
+    region: ['mediterranean', 'europe'], tags: ['calming', 'digestive', 'skincare'],
+    rarity: 'common',
+    desc: 'One of the oldest and most widely used medicinal herbs in the world, chamomile has been documented in ancient Egyptian, Greek, and Roman texts. Its apple-like scent and gentle yellow flowers belie its powerful healing properties.',
+    uses: [
+      'Relieves anxiety and promotes relaxation without sedation',
+      'Improves sleep onset and quality — mild natural sedative',
+      'Soothes gastrointestinal spasms, IBS, and indigestion',
+      'Anti-inflammatory when applied topically for skin irritations',
+      'Helps manage eczema, psoriasis, and wounds',
+      'Menstrual cramp relief and PMS support'
+    ],
+    prep: 'Tea: 1–2 tbsp dried flowers steeped in hot water 5–10 minutes. 3 cups daily for therapeutic effects. Topical application as compress or in creams. Essential oil diffused for anxiety. Tincture (15–40 drops) in water 3× daily.',
+    caution: 'Allergy risk for those sensitive to ragweed, chrysanthemums, or daisies (Asteraceae family). May enhance effects of blood thinners. Avoid high doses in pregnancy. Can cause drowsiness — do not drive after heavy use.',
+    info: { origin: 'Europe, Western Asia', habitat: 'Fields, roadsides', part: 'Flower heads', season: 'Summer (June–August)', compounds: 'Apigenin, alpha-bisabolol, azulene' }
+  },
+  {
+    id: 5, emoji: '🌱', name: 'Ginger', latin: 'Zingiber officinale',
+    family: 'Zingiberaceae', badge: 'Universal Healer',
+    region: ['asia', 'india'], tags: ['digestive', 'pain', 'immunity'],
+    rarity: 'common',
+    desc: 'One of humanity\'s oldest remedies, ginger has been traded and revered for over 5,000 years. Native to Southeast Asia, it traveled the ancient spice routes to become a cornerstone of global herbal medicine and cuisine.',
+    uses: [
+      'Highly effective for nausea — pregnancy, chemotherapy, motion sickness',
+      'Anti-inflammatory — helps with arthritis and muscle soreness',
+      'Supports digestive enzyme activity and gut motility',
+      'Warming circulatory stimulant — improves peripheral circulation',
+      'Antiviral properties — reduces severity of colds and flu',
+      'May help lower blood sugar in type 2 diabetes'
+    ],
+    prep: 'Fresh root sliced and boiled for 10 min as tea. Dried powder (1g) with honey. Candied ginger for nausea. Juice extracted and diluted. Fresh ginger paste applied topically for muscle pain. Dosage: up to 4g daily for adults.',
+    caution: 'Large amounts may cause heartburn or mouth irritation. May interact with blood thinners (warfarin). Caution with gallstones. Limit to culinary amounts in first trimester of pregnancy. May lower blood sugar — monitor if diabetic.',
+    info: { origin: 'Southeast Asia', habitat: 'Tropical moist shade', part: 'Rhizome (root)', season: 'Year-round', compounds: 'Gingerols, shogaols, zingerone' }
+  },
+  {
+    id: 6, emoji: '💜', name: 'Lavender', latin: 'Lavandula angustifolia',
+    family: 'Lamiaceae', badge: 'Aromatic Healer',
+    region: ['mediterranean'], tags: ['calming', 'skincare', 'pain'],
+    rarity: 'common',
+    desc: 'With its iconic purple blooms and intoxicating fragrance, lavender has been used since ancient Rome for bathing, cooking, and healing. Its name derives from the Latin "lavare" — to wash. Today it is among the most researched herbs for anxiety.',
+    uses: [
+      'Clinically proven to reduce anxiety and depression symptoms',
+      'Improves sleep quality — comparable to sleep medications in some studies',
+      'Applied topically for minor burns, insect bites, and wounds',
+      'Relieves tension headaches and migraines',
+      'Anti-fungal properties useful for skin infections',
+      'Aromatherapy reduces agitation in dementia patients'
+    ],
+    prep: 'Aromatherapy: 2–4 drops in diffuser or on pillow. Tea: 1 tsp dried flowers, steep 10 min. Tincture: 20–40 drops in water. Topical oil diluted 2% in carrier oil. Lavender capsules (80–160mg) standardized to linalool for anxiety.',
+    caution: 'Generally safe. Topical use may rarely cause skin sensitization. Oral essential oil should be food-grade only. May increase effects of sedative medications. Boys approaching puberty should avoid regular topical or oral use (possible hormonal effects in very high doses).',
+    info: { origin: 'Mediterranean', habitat: 'Sunny, well-drained hillsides', part: 'Flowers, leaves, oil', season: 'Summer bloom', compounds: 'Linalool, linalyl acetate, camphor' }
+  },
+  {
+    id: 7, emoji: '🌺', name: 'Neem', latin: 'Azadirachta indica',
+    family: 'Meliaceae', badge: 'Village Pharmacy',
+    region: ['india', 'asia'], tags: ['skincare', 'immunity', 'digestive'],
+    rarity: 'common',
+    desc: 'Called the "village pharmacy" in India, neem is a tree of extraordinary medicinal breadth. Every part — leaf, bark, seed, root — has documented therapeutic uses. Sanskrit texts from 4,500 years ago describe it as "sarvaroga nivarini" — the curer of all ailments.',
+    uses: [
+      'Potent antibacterial and antifungal for skin infections',
+      'Used to treat acne, eczema, and psoriasis',
+      'Natural pesticide — traditional use for crop and grain storage',
+      'Supports liver health and blood purification',
+      'Dental hygiene — neem twigs used as toothbrushes reduce plaque',
+      'Antidiabetic properties — may reduce blood glucose'
+    ],
+    prep: 'Leaf juice (10–20ml) on empty stomach. Decoction of leaves for skin wash. Neem oil diluted (2%) for topical application. Bark powder for dental hygiene. Fresh leaves chewed (bitter) for blood purification. Capsules 500mg dried leaf.',
+    caution: 'Do NOT use during pregnancy — traditionally used as abortifacient. Keep away from young children. Neem oil toxic if ingested. High oral doses may cause liver toxicity. Avoid in organ transplant patients. Not for infants.',
+    info: { origin: 'Indian Subcontinent', habitat: 'Dry tropical forest', part: 'Leaves, bark, seeds, oil', season: 'Perennial', compounds: 'Nimbin, azadirachtin, nimbidin' }
+  },
+  {
+    id: 8, emoji: '🌾', name: 'Triphala', latin: 'Terminalia chebula / T. bellerica / Phyllanthus emblica',
+    family: 'Various', badge: 'Three-Fruit Formula',
+    region: ['india'], tags: ['digestive', 'immunity', 'skincare'],
+    rarity: 'uncommon',
+    desc: 'Triphala is not a single plant but Ayurveda\'s most celebrated formulation — a blend of three sacred fruits. Used for over 1,000 years, it is considered a "tri-doshic" rasayana, balancing all three doshas in the body.',
+    uses: [
+      'Gentle colon cleanser and bowel regulator',
+      'Rich source of Vitamin C (from Amla/amalaki component)',
+      'Supports eye health — used as eye wash for conjunctivitis',
+      'Helps with weight management and fat metabolism',
+      'Prebiotic — feeds beneficial gut bacteria',
+      'Wound healing when applied topically as paste'
+    ],
+    prep: 'Powder (1/2–1 tsp) in warm water before bed or morning. Can add honey for palatability. Tablets 500mg–1g daily. Decoction boiled for 10 min. Eye wash: diluted cooled decoction strained through cloth. Start with small dose and increase gradually.',
+    caution: 'May cause loose stools when starting — reduce dose. Avoid during pregnancy and breastfeeding. Caution with diarrhea conditions. May interact with blood thinners. Not suitable if severely dehydrated. Separate from medications by 1–2 hours.',
+    info: { origin: 'India, Sri Lanka', habitat: 'Tropical dry forest', part: 'Three dried fruits', season: 'Annual harvest', compounds: 'Chebulinic acid, ellagic acid, gallic acid, Vitamin C' }
+  },
+  {
+    id: 9, emoji: '🌸', name: 'Echinacea', latin: 'Echinacea purpurea',
+    family: 'Asteraceae', badge: 'Immune Booster',
+    region: ['americas'], tags: ['immunity', 'respiratory'],
+    rarity: 'uncommon',
+    desc: 'Native to North America and used by at least 14 First Nations peoples for centuries, Echinacea was adopted by European settlers and is now one of the best-selling herbal remedies worldwide. Modern research confirms its immune-modulating properties.',
+    uses: [
+      'Reduces duration of common cold by 1–4 days',
+      'Reduces risk of catching colds by up to 58%',
+      'Stimulates innate immune function (macrophage activity)',
+      'Anti-inflammatory for upper respiratory infections',
+      'Wound healing properties when applied topically',
+      'May help with recurrent urinary tract infections'
+    ],
+    prep: 'Tincture (4ml in water) 3–4× daily at onset of illness. Tea from dried root or leaves. Capsules 300–500mg 3× daily. Use at onset of symptoms — not recommended for continuous daily use beyond 8–10 weeks. Cycle off for 4–8 weeks.',
+    caution: 'Avoid with autoimmune conditions (lupus, MS, rheumatoid arthritis). Allergy risk with Asteraceae family. Not recommended for more than 10 weeks continuous use. Contraindicated with immunosuppressant drugs. Use cautiously in children.',
+    info: { origin: 'Central North America', habitat: 'Prairies, open woodlands', part: 'Root, leaves, flower', season: 'Summer–Autumn', compounds: 'Alkylamides, caffeic acid derivatives, polysaccharides' }
+  },
+  {
+    id: 10, emoji: '🍀', name: 'Peppermint', latin: 'Mentha × piperita',
+    family: 'Lamiaceae', badge: 'Cooling Herb',
+    region: ['mediterranean', 'europe'], tags: ['digestive', 'pain', 'respiratory'],
+    rarity: 'common',
+    desc: 'A natural hybrid of watermint and spearmint, peppermint has been found in Egyptian tombs dating to 1000 BC. Its high menthol content gives it a distinctive cooling sensation and makes it one of the most versatile and widely used herbs.',
+    uses: [
+      'IBS symptom relief — enteric-coated peppermint oil capsules are clinically proven',
+      'Relieves tension headaches when applied to temples',
+      'Clears nasal congestion and supports respiratory health',
+      'Reduces nausea and vomiting',
+      'Natural antimicrobial for oral health',
+      'Muscle relaxant for tension and spasms'
+    ],
+    prep: 'Tea: 7–10 fresh leaves or 1 tsp dried, steep 5–7 min. Enteric-coated capsules (0.2–0.4ml) for IBS. Diluted essential oil (10%) for topical headache application. Steam inhalation of fresh leaves for congestion. Oil gargle for oral health.',
+    caution: 'Do not apply undiluted essential oil to skin — causes burns. Avoid peppermint in infants and young children around the face (respiratory risk). May worsen GERD in some. Avoid if on cyclosporine or certain medications metabolized by the liver.',
+    info: { origin: 'Europe, Middle East', habitat: 'Moist temperate areas', part: 'Leaves, flowering tops', season: 'Spring–Summer', compounds: 'Menthol, menthone, menthyl acetate' }
+  },
+  {
+    id: 11, emoji: '🌻', name: 'Calendula', latin: 'Calendula officinalis',
+    family: 'Asteraceae', badge: 'Skin Saviour',
+    region: ['mediterranean'], tags: ['skincare', 'pain', 'immunity'],
+    rarity: 'common',
+    desc: 'The pot marigold has been cultivated since ancient times around the Mediterranean. Medieval herbalists called it "the herb of the sun" for its golden, sun-like flowers. Today it remains one of the most widely used topical herbal remedies for skin healing.',
+    uses: [
+      'Accelerates wound healing and reduces scarring',
+      'Anti-inflammatory for eczema, dermatitis, and psoriasis',
+      'Reduces radiation therapy skin reactions (clinically studied)',
+      'Soothes diaper rash, chapped lips, and dry skin',
+      'Antifungal for athlete\'s foot and candida skin infections',
+      'Internally for gastric ulcers and inflammatory bowel conditions'
+    ],
+    prep: 'Infused oil: flower heads in olive oil for 4 weeks. Cream/salve applied as needed topically. Tea (2 tsp dried petals, 5 min steep) for internal use. Compress soaked in calendula tea for wounds. Tincture 1:5 in 60% alcohol, 1–4ml 3× daily.',
+    caution: 'Avoid if allergic to Asteraceae family. Generally very safe topically. Avoid during pregnancy internally (uterine stimulant). Theoretically may interact with sedatives. Some individuals may develop contact dermatitis — patch test first.',
+    info: { origin: 'Southern Europe', habitat: 'Gardens, temperate regions', part: 'Flower petals', season: 'Spring–Autumn', compounds: 'Flavonoids, triterpene saponins, carotenoids' }
+  },
+  {
+    id: 12, emoji: '🌿', name: 'Brahmi', latin: 'Bacopa monnieri',
+    family: 'Plantaginaceae', badge: 'Brain Tonic',
+    region: ['india', 'asia'], tags: ['calming', 'immunity'],
+    rarity: 'uncommon',
+    desc: 'Named after the Hindu god Brahma and referenced in ancient texts including the Atharva Veda (6th Century BC), Brahmi is Ayurveda\'s premier nerve and brain tonic. It was traditionally taken by scholars to memorize vast texts.',
+    uses: [
+      'Significantly improves memory, learning, and information retention',
+      'Reduces anxiety and symptoms of ADHD',
+      'Neuroprotective — may slow cognitive decline in aging',
+      'Adaptogenic — reduces cortisol and stress response',
+      'Traditionally used for epilepsy and nervous system disorders',
+      'Supports thyroid health'
+    ],
+    prep: 'Powder (1/4–1/2 tsp) with ghee or warm milk. Brahmi oil massaged into scalp for hair growth and mental calm. Standardized extract (300mg of 50% bacosides daily). Effects on cognition typically noticed after 4–6 weeks. Juice (10–20ml) fresh.',
+    caution: 'May cause digestive upset — take with food. Can slow heart rate — caution with cardiac medications. May increase secretions — avoid with lung conditions. Some individuals experience fatigue initially. Not recommended in first trimester of pregnancy.',
+    info: { origin: 'India, Southeast Asia', habitat: 'Wet marshy areas, ponds', part: 'Whole plant (leaves, stems)', season: 'Year-round', compounds: 'Bacosides A & B, apigenin, luteolin' }
+  }
+];
+
+let currentFilter = 'all';
+let searchQuery = '';
+let currentPlant = null;
+
+function renderGrid(filtered) {
+  const grid = document.getElementById('gardenGrid');
+  grid.innerHTML = '';
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-results">No plants found. Try a different search or filter.</div>';
+    return;
+  }
+
+  filtered.forEach((plant, i) => {
+    const card = document.createElement('div');
+    card.className = 'plant-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.innerHTML = `
+      <div class="plant-card-img">${plant.emoji}</div>
+      <div class="plant-card-body">
+        <div class="plant-family">${plant.family}</div>
+        <h3 class="plant-name">${plant.name}</h3>
+        <div class="plant-latin">${plant.latin}</div>
+        <p class="plant-desc">${plant.desc.substring(0, 100)}…</p>
+        <div class="plant-tags">
+          ${plant.tags.map(t => `<span class="plant-tag">${t}</span>`).join('')}
+        </div>
+        <div class="plant-card-footer">
+          <div class="rarity-dot">
+            <div class="dot ${plant.rarity}"></div>
+            ${plant.rarity}
+          </div>
+          <button class="view-btn" onclick="openModal(${plant.id})">View Details</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filterPlants() {
+  searchQuery = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = plants.filter(p => {
+    const matchesFilter = currentFilter === 'all' || p.tags.includes(currentFilter) || p.region.includes(currentFilter);
+    const matchesSearch = !searchQuery ||
+      p.name.toLowerCase().includes(searchQuery) ||
+      p.latin.toLowerCase().includes(searchQuery) ||
+      p.desc.toLowerCase().includes(searchQuery) ||
+      p.tags.some(t => t.includes(searchQuery)) ||
+      p.uses.some(u => u.toLowerCase().includes(searchQuery));
+    return matchesFilter && matchesSearch;
+  });
+  renderGrid(filtered);
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  filterPlants();
+}
+
+function openModal(id) {
+  const plant = plants.find(p => p.id === id);
+  if (!plant) return;
+  currentPlant = plant;
+
+  document.getElementById('modalEmoji').textContent = plant.emoji;
+  document.getElementById('modalBadge').textContent = plant.badge;
+  document.getElementById('modalFamily').textContent = plant.family;
+  document.getElementById('modalTitle').textContent = plant.name;
+  document.getElementById('modalLatin').textContent = plant.latin;
+  document.getElementById('modalDesc').textContent = plant.desc;
+
+  const infoGrid = document.getElementById('infoGrid');
+  infoGrid.innerHTML = Object.entries(plant.info).map(([k, v]) => `
+    <div class="info-block">
+      <div class="info-block-label">${k.charAt(0).toUpperCase() + k.slice(1)}</div>
+      <div class="info-block-val">${v}</div>
+    </div>
+  `).join('');
+
+  const usesList = document.getElementById('usesList');
+  usesList.innerHTML = plant.uses.map(u => `<li>${u}</li>`).join('');
+  document.getElementById('prepText').textContent = plant.prep;
+  document.getElementById('cautionText').textContent = plant.caution;
+
+  // Reset tabs
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.modal-tab')[0].classList.add('active');
+  document.getElementById('tab-overview').classList.add('active');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// Search on enter
+document.getElementById('searchInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') filterPlants();
+});
+document.getElementById('searchInput').addEventListener('input', filterPlants);
+
+// Escape key closes modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModalBtn();
+});
+
+// Cursor
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+});
+
+function animateRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  cursorRing.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+  requestAnimationFrame(animateRing);
+}
+animateRing();
+
+document.addEventListener('mousedown', () => cursor.style.transform += ' scale(0.7)');
+document.addEventListener('mouseup', () => {});
+
+// Intersection Observer for reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Init
+renderGrid(plants);
+</script>
+</body>
+</html>
